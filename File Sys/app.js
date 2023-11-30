@@ -75,3 +75,30 @@ app.post('/api/create-data', async (req, res) => {
     }
 });
 
+//Update Data
+app.put('/api/update/:id', async (req, res) => {
+    const reqId = parseInt(req.params.id);
+    const { data: updateData } = req.body;
+
+    if (!updateData) {
+        res.status(400).json({ error: 'Data is required for update. ' });
+    }
+
+    try {
+        const fileContent = await fs.promises.readFile(filePath, { encoding: 'utf8' });
+        const existData = fileContent.split('\n').filter(Boolean).map(JSON.parse);
+
+        const dataIndex = existData.findIndex(x => x.id == reqId);
+        console.log(dataIndex);
+        if (dataIndex == -1) {
+            return res.status(404).json({ error: 'Data not found.' });
+        }
+
+        existData[dataIndex].data = updateData;
+        await fs.promises.writeFile(fileContent, existData.map(JSON.stringify).join('\n'), { encoding: 'utf8' });
+
+        res.json({ success: true, message: 'Data updated successfully.' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error writing data to the file.' });
+    }
+});
