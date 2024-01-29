@@ -16,7 +16,7 @@ const filePath = 'data.txt';
 
 //Routes and CRUD operations
 app.listen(port, () => {
-    console.log('Server is running on http://localhost:${port}');
+    console.log(`Server is running on http://localhost:${port}`);
 });
 
 //Read All Data
@@ -40,8 +40,11 @@ app.get('/api/data', async (req, res) => {
 app.get('/api/:id', async (req, res) => {
     const reqId = parseInt(req.params.id);
     try {
-        const fileContent = await fs.readFile(filePath, 'utf8');
+        console.log(reqId)
+        const fileContent = await fs.promises.readFile(filePath, { encoding: 'utf8' });
+        console.log(fileContent)
         const data = fileContent.split('\n').filter(Boolean).map(JSON.parse);
+
         const reqData = data.find(x => x.id === reqId);
         if (!reqData) {
             return res.status(404).json({ error: 'Anni daya ID ty sahi de. ' });
@@ -94,11 +97,18 @@ app.put('/api/update/:id', async (req, res) => {
             return res.status(404).json({ error: 'Data not found.' });
         }
 
-        existData[dataIndex].data = updateData;
+        existData[dataIndex].data;
+        console.log(existData);
         await fs.promises.writeFile(fileContent, existData.map(JSON.stringify).join('\n'), { encoding: 'utf8' });
 
         res.json({ success: true, message: 'Data updated successfully.' });
     } catch (error) {
         res.status(500).json({ error: 'Error writing data to the file.' });
     }
+});
+
+//Delete Data
+app.delete('api/data/:id', async(req, res)=>{
+const reqId = parseInt(req.parse.id);
+
 });
